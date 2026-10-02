@@ -69,13 +69,13 @@ luarocks make kong-plugin-ipgeolocation-0.1.0-1.rockspec
 
 ### Install in a Docker image
 
-Build an image with the plugin baked in from [`examples/docker/Dockerfile`](examples/docker/Dockerfile):
+Build an image with the plugin baked in from [`examples/docker/Dockerfile`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/docker/Dockerfile).:
 
 ```sh
 docker build -f examples/docker/Dockerfile -t kong-ipgeolocation .
 ```
 
-[`examples/docker/docker-compose.yml`](examples/docker/docker-compose.yml) runs Kong in DB-less mode next to an updater container that downloads the databases into a shared volume.
+[`examples/docker/docker-compose.yml`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/docker/docker-compose.yml) runs Kong in DB-less mode next to an updater container that downloads the databases into a shared volume.
 
 ### Install on Kubernetes
 
@@ -85,7 +85,7 @@ The plugin's modules live in one directory, so a single ConfigMap carries the wh
 kubectl create configmap kong-plugin-ipgeolocation -n kong --from-file=kong/plugins/ipgeolocation
 ```
 
-[`examples/kubernetes`](examples/kubernetes) has Helm values with a database volume, an init container and an updater sidecar, plus `KongPlugin` and `KongClusterPlugin` resources and an annotated Ingress.
+[`examples/kubernetes`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/tree/main/examples/kubernetes) has Helm values with a database volume, an init container and an updater sidecar, plus `KongPlugin` and `KongClusterPlugin` resources and an annotated Ingress.
 
 ### Enable the plugin
 
@@ -185,7 +185,7 @@ real_ip_header = X-Forwarded-For
 real_ip_recursive = on
 ```
 
-[`examples/kong.yml`](examples/kong.yml) is a larger example with per country routing, rate limiting per country, a dry run rollout and logging.
+[`examples/kong.yml`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/kong.yml) is a larger example with per country routing, rate limiting per country, a dry run rollout and logging.
 
 ## Getting the databases
 
@@ -205,7 +205,7 @@ Download the `.mmdb` files from your [IPGeolocation.io account](https://app.ipge
 
 Combined products ship two files in one archive, for example City + Security as `db-ip-city.mmdb` and `db-ip-security.mmdb`. List both files. Some combined files hold several data sets in one file, such as `db-ip-city-company-asn.mmdb`.
 
-Load only what you need. Fields from a database you did not load stay empty, so referencing them is safe. [docs/DATABASES.md](docs/DATABASES.md) lists every file, the products that ship it and the fields it provides. Tiers and bundles are on the [pricing page](https://ipgeolocation.io/db-pricing.html), and the [database documentation](https://ipgeolocation.io/documentation/databases.html) shows the full schemas.
+Load only what you need. Fields from a database you did not load stay empty, so referencing them is safe. [docs/DATABASES.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/DATABASES.md) lists every file, the products that ship it and the fields it provides. Tiers and bundles are on the [pricing page](https://ipgeolocation.io/db-pricing.html), and the [database documentation](https://ipgeolocation.io/documentation/databases.html) shows the full schemas.
 
 > [!TIP]
 > You can evaluate the plugin before buying anything. IPGeolocation.io offers sample databases that are real MMDB files covering part of the address space, so you can work through the whole [Quick start](#quick-start) with them. To read a file directly, use [mmdbio](https://github.com/IPGeolocation/mmdbio).
@@ -436,7 +436,7 @@ Each log entry then has an `ipgeolocation` object with the country, city, ASN, t
 
 ## Keeping databases up to date
 
-IPGeolocation.io updates its databases daily. [`examples/updater/ipgeolocation-update.sh`](examples/updater/ipgeolocation-update.sh) downloads them, checks `checksum.txt`, optionally checks IPGeolocation.io's signature with their public key, validates each file and installs it. Give it the download links through the `IPGEO_URLS` environment variable from a secret. It never writes the links' query strings, which hold your API key, to its log.
+IPGeolocation.io updates its databases daily. [`examples/updater/ipgeolocation-update.sh`](https://github.com/Kong/kong-plugin-ipgeolocation/blob/main/examples/updater/ipgeolocation-update.sh) downloads them, checks `checksum.txt`, optionally checks IPGeolocation.io's signature with their public key, validates each file and installs it. Give it the download links through the `IPGEO_URLS` environment variable from a secret. It never writes the links' query strings, which hold your API key, to its log.
 
 > [!IMPORTANT]
 > Replace a database file atomically, never edit it in place. Download to a temporary file in the same directory, check it, then rename it over the old file. Truncating or rewriting a file that Kong has mapped can serve torn data or crash workers with `SIGBUS`. The updater script does this for you, and the plugin logs a warning when it sees a file modified in place.
@@ -446,7 +446,7 @@ There are two ways to make Kong use the new files:
 - `kong reload`, the default. New workers open the new files and old workers finish their requests with the old ones. This works everywhere, including with refresh turned off. The updater runs it for you with `-r`.
 - `database_refresh_interval`. Each worker checks the file at that interval and swaps in a validated replacement without a reload. If the replacement does not validate, the database in service stays. Workers swap independently, so for up to one interval plus 10 seconds different workers can serve different releases.
 
-On Kubernetes, prefer storage local to the pod, such as an `emptyDir` filled by an init container and refreshed by a sidecar as in [`examples/kubernetes`](examples/kubernetes), or a rolling restart. Do not replace files on a network filesystem shared across nodes while Kong has them mapped, because a file replaced from another node can become a stale handle on the node that maps it.
+On Kubernetes, prefer storage local to the pod, such as an `emptyDir` filled by an init container and refreshed by a sidecar as in [`examples/kubernetes`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/tree/main/examples/kubernetes), or a rolling restart. Do not replace files on a network filesystem shared across nodes while Kong has them mapped, because a file replaced from another node can become a stale handle on the node that maps it.
 
 ## Failure handling
 
@@ -486,7 +486,7 @@ Inside Kong (one worker, `ab` on the same vCPU, Kong answering directly with `re
 
 About half of the `standard` figure is database work, a fifth is setting 15 headers, and the rest is header stripping and Kong's own per plugin work. To keep the cost down, request only the headers your services use, and use `preset: none` where you only need the policy.
 
-Opening 305 MiB of databases added 1.2 MiB of resident memory. Pages are read on demand and shared by all workers through the page cache, so plan for the page cache to hold the parts of your databases that traffic touches. For heavy and varied traffic that can be their full size, and the full Security Database is several GiB. [`bench/bench.lua`](bench/bench.lua) reproduces the database measurements on your own databases and hardware.
+Opening 305 MiB of databases added 1.2 MiB of resident memory. Pages are read on demand and shared by all workers through the page cache, so plan for the page cache to hold the parts of your databases that traffic touches. For heavy and varied traffic that can be their full size, and the full Security Database is several GiB. [`bench/bench.lua`](https://github.com/Kong/kong-plugin-ipgeolocation/blob/main/bench/bench.lua) reproduces the database measurements on your own databases and hardware.
 
 ## Troubleshooting
 
@@ -496,7 +496,7 @@ Opening 305 MiB of databases added 1.2 MiB of resident memory. Pages are read on
 
 **Every request gets the same location.** Same cause: Kong sees the load balancer and not the client.
 
-**One header is missing.** The databases you loaded have no value for that field, or the value is empty for that address. [docs/DATABASES.md](docs/DATABASES.md) lists the fields of every database file. To inspect a record directly, use [mmdbio](https://github.com/IPGeolocation/mmdbio).
+**One header is missing.** The databases you loaded have no value for that field, or the value is empty for that address. [docs/DATABASES.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/DATABASES.md) lists the fields of every database file. To inspect a record directly, use [mmdbio](https://github.com/IPGeolocation/mmdbio).
 
 **An updated database is not used.** Refresh is off by default. Run `kong reload`, or set `database_refresh_interval`.
 
@@ -512,86 +512,62 @@ Opening 305 MiB of databases added 1.2 MiB of resident memory. Pages are read on
 
 <details>
 <summary><strong>Does this plugin call the IPGeolocation.io API?</strong></summary>
-
 No. It reads local `.mmdb` files and makes no outbound requests on the request path, so there are no API quotas and no per-request costs, and Kong keeps working if the network to IPGeolocation.io is down. Only the [updater](#keeping-databases-up-to-date) talks to IPGeolocation.io, to download new releases.
-
 </details>
 
 <details>
 <summary><strong>Which databases do I need?</strong></summary>
-
 It depends on what you block or send to your backend. Country and city headers or geo-blocking need the IP Geolocation database, or the smaller Country database for country rules only. VPN, proxy, Tor, bot and threat score rules need the Security Database. ASN filtering needs IP to ASN, and ISP or company names need IP Company. You can load several together and the plugin [layers them](#how-it-works), so start with one and add more later without changing your rules. The full list is in [Getting the databases](#getting-the-databases).
-
 </details>
 
 <details>
 <summary><strong>How is this different from other Kong GeoIP plugins?</strong></summary>
-
 Most use `libmaxminddb` through FFI or need a custom Kong or OpenResty build with an nginx GeoIP module. This plugin has its own MMDB reader in pure LuaJIT, so it installs on a stock Kong with LuaRocks or a ConfigMap. It is built for IPGeolocation.io schemas, [layers multiple databases](#how-it-works), exposes [security and ASN data](#request-headers) as well as location, and can block on any of it.
-
 </details>
 
 <details>
 <summary><strong>Does it work with DB-less mode, PostgreSQL, hybrid mode and Kubernetes?</strong></summary>
-
 Yes. The plugin is tested in DB-less mode and with PostgreSQL. In hybrid mode, install it on the control planes and the data planes, and put the database files on the data planes only. On Kubernetes, load it with a ConfigMap through the `kong/kong` Helm chart and configure it with `KongPlugin` or `KongClusterPlugin`. See [Installation](#installation).
-
 </details>
 
 <details>
 <summary><strong>Can I route requests by country?</strong></summary>
-
 Yes. Apply the plugin globally so it runs before Kong's router, then match routes on the `X-IPGeo-Country-Code` header. A client cannot steer routing with a fake header, because the plugin replaces it first. See [Scopes, phases and routing](#scopes-phases-and-routing).
-
 </details>
 
 <details>
 <summary><strong>Can clients fake the X-IPGeo headers?</strong></summary>
-
 No. The plugin removes every client supplied header in the `X-IPGeo-` namespace, in any letter case and with underscores, before it adds its own. It also removes client copies of your custom header names. See [Spoofed header protection](#spoofed-header-protection).
-
 </details>
 
 <details>
 <summary><strong>Does it work behind Cloudflare, an AWS load balancer or another proxy?</strong></summary>
-
 Yes. Set Kong's `trusted_ips` to the proxy's addresses and `real_ip_header` to the header that carries the client address, such as `X-Forwarded-For` or `CF-Connecting-IP`. Without that, every visitor looks like your load balancer. See [Client IP selection](#client-ip-selection).
-
 </details>
 
 <details>
 <summary><strong>How much latency does it add?</strong></summary>
-
 About 15 µs of CPU per request for a security policy without headers, and about 33 µs with the `standard` preset across three databases. Cost grows with the number of headers and rules you use, not with the size of the database. The numbers and the benchmark setup are in [Performance and memory](#performance-and-memory).
-
 </details>
 
 <details>
 <summary><strong>How do I update the databases without restarting Kong?</strong></summary>
-
 Set `database_refresh_interval` (for example `3600`) and have a scheduled job replace the files atomically. The plugin notices the change, validates the new file, swaps it in and keeps serving the old copy if the new one does not open. You can also run `kong reload` after each update. See [Keeping databases up to date](#keeping-databases-up-to-date).
-
 </details>
 
 <details>
 <summary><strong>What happens if a database is missing or broken?</strong></summary>
-
 Traffic keeps flowing by default. A missing database is retried every 30 seconds, a broken replacement never replaces the database in service, and requests follow `fail_open`, which allows them unless you set it to `false`. See [Failure handling](#failure-handling).
-
 </details>
 
 <details>
 <summary><strong>Does it support IPv6?</strong></summary>
-
 Yes. IPGeolocation.io databases cover both address families, and the plugin looks up whichever address Kong resolved for the client. Every rule and header works the same for IPv6, and IPv4-mapped addresses such as `::ffff:203.0.113.7` are looked up as IPv4.
-
 </details>
 
 <details>
 <summary><strong>Can I use the same databases with Nginx and Traefik?</strong></summary>
-
 Yes. The [Nginx module](https://github.com/IPGeolocation/ngx_http_ipgeolocation_module) and the [Traefik plugin](https://github.com/IPGeolocation/traefik-plugin-ipgeolocation) read the same files and use the same field names, header names and presets. The Kong plugin always strips the whole `X-IPGeo-` namespace, always takes the client address from Kong's trusted proxy handling, and leaves the long ASN routing lists out of the `full` preset. Dry run, exemptions, a configurable status code and message, and log integration are Kong additions.
-
 </details>
 
 ## Development
@@ -603,7 +579,7 @@ pongo run spec/integration       # Kong's test harness: schema and proxy behavio
 python3 spec/e2e/e2e.py          # a real Kong (kong and resty on PATH), end to end
 ```
 
-[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) covers the code layout, the test fixtures, the cross check against `python-maxminddb`, benchmarks and the release process. Contributions are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). Report vulnerabilities as described in [SECURITY.md](SECURITY.md), and read [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) for the threat model.
+[docs/DEVELOPMENT.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/DEVELOPMENT.md) covers the code layout, the test fixtures, the cross check against `python-maxminddb`, benchmarks and the release process. Contributions are welcome, see [CONTRIBUTING.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/CONTRIBUTING.md). Report vulnerabilities as described in [SECURITY.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/SECURITY.md), and read [docs/SECURITY_REVIEW.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/SECURITY_REVIEW.md) for the threat model.
 
 ## Related tools and links
 
@@ -634,6 +610,6 @@ Kong and format references:
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/LICENSE).
 
 Built for [IPGeolocation.io](https://ipgeolocation.io) databases. Questions about the data, tiers or bundles are answered on the [database documentation](https://ipgeolocation.io/documentation/databases.html) and [pricing](https://ipgeolocation.io/db-pricing.html) pages.
