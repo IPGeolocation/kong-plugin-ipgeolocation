@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: accounts
+  namespace: default
+  annotations:
+    konghq.com/plugins: ipgeolocation-login
+spec:
+  ingressClassName: kong
+  rules:
+    - http:
+        paths:
+          - path: /login
+            pathType: Prefix
+            backend:
+              service:
+                name: accounts
+                port:
+                  number: 80

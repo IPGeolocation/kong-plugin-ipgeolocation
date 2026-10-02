@@ -1,0 +1,152 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-unit:
+    name: Lint and unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: luajit-openresty
+      - uses: leafo/gh-actions-luarocks@v4
+      - name: Install tools
+        run: |
+          luarocks install luacheck 1.2.0
+          luarocks install busted 2.2.0
+          luarocks install luafilesystem
+      - run: luacheck .
+      - run: busted
+
+  integration:
+    name: Integration, Kong ${{ matrix.kong_version }} (Pongo)
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        kong_version: ["3.9.x"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Kong/kong-pongo-action@v1
+        with:
+          kong_version: ${{ matrix.kong_version }}
+      - run: pongo run spec/integration
+
+  integration-enterprise:
+    name: Integration, Kong Enterprise ${{ matrix.kong_version }} (Pongo)
+    runs-on: ubuntu-24.04
+    env:
+      KONG_LICENSE_DATA: ${{ secrets.KONG_LICENSE_DATA }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The LTS releases. Adjust to the versions known to your Pongo release.
+        kong_version: ["3.10.0.x", "3.14.0.x"]
+    steps:
+      - name: Skip without a license
+        if: env.KONG_LICENSE_DATA == ''
+        run: echo "KONG_LICENSE_DATA is not set; Enterprise integration tests skipped."
+      - uses: actions/checkout@v4
+        if: env.KONG_LICENSE_DATA != ''
+      - uses: Kong/kong-pongo-action@v1
+        if: env.KONG_LICENSE_DATA != ''
+        with:
+          kong_version: ${{ matrix.kong_version }}
+          license: ${{ secrets.KONG_LICENSE_DATA }}
+      - if: env.KONG_LICENSE_DATA != ''
+        run: pongo run spec/integration
+
+  e2e:
+    name: End to end, Kong Gateway OSS 3.9
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Kong Gateway
+        run: |
+          curl -1sLf "https://packages.konghq.com/public/gateway-39/gpg.B9DCD032B1696A89.key" \
+            | sudo gpg --dearmor -o /usr/share/keyrings/kong-gateway-39-archive-keyring.gpg
+          curl -1sLf "https://packages.konghq.com/public/gateway-39/config.deb.txt?distro=ubuntu&codename=$(lsb_release -sc)" \
+            | sudo tee /etc/apt/sources.list.d/kong-gateway-39.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq kong
+          kong version
+      - name: End-to-end tests (including refresh without reload)
+        run: E2E_SLOW=1 python3 spec/e2e/e2e.py
+      - name: Validate the example configurations
+        env:
+          KONG_DATABASE: "off"
+          KONG_PLUGINS: bundled,ipgeolocation
+          KONG_LUA_PACKAGE_PATH: ${{ github.workspace }}/?.lua;;
+        run: |
+          kong config parse examples/kong.yml
+          kong config parse examples/docker/kong.yml
+
+  crosscheck:
+    name: Reader cross-check on IPGeolocation.io databases
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    env:
+      # Space-separated database download links, stored as a repository secret because they contain
+      # an API key. The job is skipped when the secret is not set (for example on forks).
+      IPGEO_CROSSCHECK_URLS: ${{ secrets.IPGEO_CROSSCHECK_URLS }}
+    steps:
+      - name: Skip without download links
+        if: env.IPGEO_CROSSCHECK_URLS == ''
+        run: echo "IPGEO_CROSSCHECK_URLS is not set; reader cross-check skipped."
+      - uses: actions/checkout@v4
+        if: env.IPGEO_CROSSCHECK_URLS != ''
+      - name: Install Kong Gateway (for resty) and python-maxminddb
+        if: env.IPGEO_CROSSCHECK_URLS != ''
+        run: |
+          curl -1sLf "https://packages.konghq.com/public/gateway-39/gpg.B9DCD032B1696A89.key" \
+            | sudo gpg --dearmor -o /usr/share/keyrings/kong-gateway-39-archive-keyring.gpg
+          curl -1sLf "https://packages.konghq.com/public/gateway-39/config.deb.txt?distro=ubuntu&codename=$(lsb_release -sc)" \
+            | sudo tee /etc/apt/sources.list.d/kong-gateway-39.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq kong python3-maxminddb unzip
+      - name: Download databases, verify checksums, compare readers
+        if: env.IPGEO_CROSSCHECK_URLS != ''
+        run: |
+          set -e
+          n=0
+          for u in $IPGEO_CROSSCHECK_URLS; do
+            n=$((n + 1))
+            d="databases/$n"
+            mkdir -p "$d"
+            curl -fsSL -o "$d/archive.zip" "$u"
+            unzip -q -o "$d/archive.zip" -d "$d"
+            (cd "$(dirname "$(find "$d" -name checksum.txt | head -n 1)")" && sha256sum -c checksum.txt)
+          done
+          for f in $(find databases -name '*.mmdb'); do
+            python3 tools/crosscheck.py "$f" 3000 | tee out.txt
+            grep -q ' 0 mismatches' out.txt
+          done
+
+  package:
+    name: Package
+    runs-on: ubuntu-24.04
+    needs: [lint-unit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: luajit-openresty
+      - uses: leafo/gh-actions-luarocks@v4
+      - run: |
+          luarocks lint kong-plugin-ipgeolocation-*.rockspec
+          luarocks make kong-plugin-ipgeolocation-*.rockspec
+          luarocks pack kong-plugin-ipgeolocation
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rock
+          path: "*.rock"

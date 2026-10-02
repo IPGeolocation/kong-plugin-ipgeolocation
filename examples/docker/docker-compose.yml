@@ -1,0 +1,46 @@
+# Kong (DB-less) with the ipgeolocation plugin and a database updater.
+#
+# Put the download links from your IPGeolocation.io account in examples/docker/.env (never commit it,
+# the links contain your API key), one Location and one Security database link separated by a space:
+#
+#   IPGEO_URLS=<location database link> <security database link>
+#
+#   docker compose -f examples/docker/docker-compose.yml up --build
+#   curl -s -H 'X-Forwarded-For: <client address>' http://127.0.0.1:8000/ | jq .request.headers
+#
+# Kong starts before the first download finishes; the plugin retries missing databases every 30 seconds.
+services:
+  updater:
+    build:
+      context: ../updater
+    environment:
+      IPGEO_URLS: ${IPGEO_URLS:?set IPGEO_URLS in examples/docker/.env to your database download links}
+      IPGEO_INTERVAL: "86400"
+    command: ["-d", "/data"]
+    volumes:
+      - ipgeolocation:/data
+
+  kong:
+    build:
+      context: ../..
+      dockerfile: examples/docker/Dockerfile
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 127.0.0.1:8001
+      # Local testing only: trust Docker's networks so that X-Forwarded-For can simulate clients.
+      # In production, list only your load balancers here.
+      KONG_TRUSTED_IPS: 172.16.0.0/12,192.168.0.0/16
+      KONG_REAL_IP_HEADER: X-Forwarded-For
+      KONG_REAL_IP_RECURSIVE: "on"
+    volumes:
+      - ./kong.yml:/kong/kong.yml:ro
+      - ipgeolocation:/usr/local/share/ipgeolocation:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - updater
+
+volumes:
+  ipgeolocation:

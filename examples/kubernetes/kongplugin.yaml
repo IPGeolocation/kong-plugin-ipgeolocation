@@ -1,0 +1,39 @@
+# Global enrichment for every request this Kong handles. KongClusterPlugin resources with the
+# global label apply to all routes; the ingress class annotation selects the controller.
+apiVersion: configuration.konghq.com/v1
+kind: KongClusterPlugin
+metadata:
+  name: ipgeolocation-global
+  annotations:
+    kubernetes.io/ingress.class: kong
+  labels:
+    global: "true"
+plugin: ipgeolocation
+config:
+  databases:
+    - /usr/local/share/ipgeolocation/db-ip-location.mmdb
+    - /usr/local/share/ipgeolocation/db-ip-asn.mmdb
+    - /usr/local/share/ipgeolocation/db-ip-security.mmdb
+  database_refresh_interval: 3600
+  headers:
+    preset: standard
+---
+# A security policy attached to individual Ingresses or HTTPRoutes with the
+# konghq.com/plugins annotation (see ingress.yaml). It must be in the same namespace.
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: ipgeolocation-login
+  namespace: default
+plugin: ipgeolocation
+config:
+  databases:
+    - /usr/local/share/ipgeolocation/db-ip-security.mmdb
+  database_refresh_interval: 3600
+  headers:
+    preset: none
+  policy:
+    block_tor: true
+    block_known_attacker: true
+    block_residential_proxy: true
+    block_threat_score_above: 80

@@ -1,0 +1,29 @@
+# Demo configuration: Kong answers every request itself and echoes the request it
+# would have sent upstream, so the X-IPGeo-* headers are visible in the response.
+_format_version: "3.0"
+
+services:
+  - name: demo
+    url: http://127.0.0.1:65535
+    routes:
+      - name: demo
+        paths: [/]
+    plugins:
+      - name: request-termination
+        config:
+          status_code: 200
+          echo: true
+
+plugins:
+  - name: ipgeolocation
+    config:
+      databases:
+        - /usr/local/share/ipgeolocation/db-ip-location.mmdb
+        - /usr/local/share/ipgeolocation/db-ip-security.mmdb
+      database_refresh_interval: 3600
+      headers:
+        preset: standard
+      policy:
+        block_tor: true
+        block_known_attacker: true
+        dry_run: true

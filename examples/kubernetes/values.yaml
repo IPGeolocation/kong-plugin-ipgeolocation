@@ -1,0 +1,61 @@
+# Values for the kong/kong Helm chart: Kong Gateway in DB-less mode with the Kong Ingress Controller
+# and the ipgeolocation plugin. See README.md in this directory for the steps.
+image:
+  repository: kong
+  tag: "3.9"
+
+env:
+  database: "off"
+  # Only peers in this range may set X-Forwarded-For: your load balancer or node network.
+  trusted_ips: "10.0.0.0/8"
+  real_ip_header: X-Forwarded-For
+  real_ip_recursive: "on"
+
+plugins:
+  configMaps:
+    - pluginName: ipgeolocation
+      name: kong-plugin-ipgeolocation
+
+ingressController:
+  enabled: true
+
+proxy:
+  # With a layer-4 load balancer, keep the client address visible to Kong.
+  externalTrafficPolicy: Local
+
+deployment:
+  # Databases live on pod-local storage: an init container downloads them before Kong starts and a
+  # sidecar refreshes them daily. Kong swaps in replacements via database_refresh_interval.
+  initContainers:
+    - name: ipgeolocation-download
+      image: registry.example.com/ipgeolocation-updater:0.1.0   # built from examples/updater
+      args: ["-d", "/data"]
+      envFrom:
+        - secretRef:
+            name: ipgeolocation-download
+      volumeMounts:
+        - name: ipgeolocation-data
+          mountPath: /data
+  sidecarContainers:
+    - name: ipgeolocation-updater
+      image: registry.example.com/ipgeolocation-updater:0.1.0
+      args: ["-d", "/data", "-w", "86400", "-i", "86400"]
+      envFrom:
+        - secretRef:
+            name: ipgeolocation-download
+      volumeMounts:
+        - name: ipgeolocation-data
+          mountPath: /data
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+  userDefinedVolumes:
+    - name: ipgeolocation-data
+      emptyDir:
+        # Room for the databases plus one archive and one extracted copy during an update.
+        sizeLimit: 16Gi
+  userDefinedVolumeMounts:
+    - name: ipgeolocation-data
+      mountPath: /usr/local/share/ipgeolocation
+      readOnly: true

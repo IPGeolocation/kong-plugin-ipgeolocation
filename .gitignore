@@ -1,0 +1,17 @@
+# Kong test prefixes
+servroot/
+# Packages
+*.rock
+# Download links with API keys (docker compose reads examples/docker/.env)
+.env
+# Databases are never committed: tests generate synthetic fixtures
+*.mmdb
+*.zip
+*.sig
+# Tools and editors
+luacov.*.out
+.DS_Store
+__pycache__/
+*.pyc
+.vscode/
+.idea/

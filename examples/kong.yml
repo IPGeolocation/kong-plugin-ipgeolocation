@@ -1,0 +1,95 @@
+# DB-less configuration showing the main use cases. Validate with:
+#   KONG_DATABASE=off KONG_PLUGINS=bundled,ipgeolocation kong config parse examples/kong.yml
+# Databases are expected in /usr/local/share/ipgeolocation (see examples/updater).
+_format_version: "3.0"
+
+services:
+  # German-speaking visitors get their own shop; the route matches on a header the
+  # global ipgeolocation instance sets before routing.
+  - name: shop-dach
+    url: http://shop-dach.internal:8080
+    routes:
+      - name: shop-dach
+        paths: [/shop]
+        headers:
+          x-ipgeo-country-code: [DE, AT, CH]
+
+  - name: shop
+    url: http://shop.internal:8080
+    routes:
+      - name: shop
+        paths: [/shop]
+
+  # Login: block anonymising networks and known attackers, and keep blocking even
+  # if the security database is unavailable.
+  - name: accounts
+    url: http://accounts.internal:8080
+    routes:
+      - name: login
+        paths: [/login]
+        plugins:
+          - name: ipgeolocation
+            config:
+              databases:
+                - /usr/local/share/ipgeolocation/db-ip-security.mmdb
+              database_refresh_interval: 3600
+              headers:
+                preset: none
+              policy:
+                block_tor: true
+                block_vpn: true
+                block_proxy: true
+                block_residential_proxy: true
+                block_known_attacker: true
+                block_threat_score_above: 80
+                fail_open: false
+
+  # Public API: limit each country to 600 requests a minute, using the header set
+  # by the global instance.
+  - name: api
+    url: http://api.internal:8080
+    routes:
+      - name: api
+        paths: [/api]
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 600
+          limit_by: header
+          header_name: X-IPGeo-Country-Code
+          policy: local
+
+  # Reports: a new EU-only rule, rolled out in dry-run mode first. Would-be blocks
+  # reach the upstream with X-IPGeo-Dry-Run and appear in the logs.
+  - name: reports
+    url: http://reports.internal:8080
+    plugins:
+      - name: ipgeolocation
+        config:
+          databases:
+            - /usr/local/share/ipgeolocation/db-ip-location.mmdb
+          headers:
+            preset: minimal
+          policy:
+            allowed_continents: [EU]
+            status_code: 451
+            message: This service is not available in your region
+            dry_run: true
+          log_serialize: true
+    routes:
+      - name: reports
+        paths: [/reports]
+
+plugins:
+  # Global enrichment: runs before routing, so routes can match on X-IPGeo-* headers.
+  - name: ipgeolocation
+    config:
+      databases:
+        - /usr/local/share/ipgeolocation/db-ip-location.mmdb
+        - /usr/local/share/ipgeolocation/db-ip-asn.mmdb
+        - /usr/local/share/ipgeolocation/db-ip-security.mmdb
+      database_refresh_interval: 3600
+      headers:
+        preset: standard
+      policy:
+        exempt_ips: [198.51.100.0/24]   # a partner network, never blocked
