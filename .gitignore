@@ -2,6 +2,9 @@
 servroot/
 # Packages
 *.rock
+# Lua and rocks installed into the workspace (CI, local setups)
+.lua/
+.luarocks/
 # Download links with API keys (docker compose reads examples/docker/.env)
 .env
 # Databases are never committed: tests generate synthetic fixtures

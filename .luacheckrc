@@ -32,4 +32,7 @@ files["tools/*.lua"] = {
 exclude_files = {
   ".pongo/**",
   "servroot/**",
+  -- Lua and rocks installed into the workspace by CI
+  ".lua/**",
+  ".luarocks/**",
 }
