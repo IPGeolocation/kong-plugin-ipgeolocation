@@ -69,7 +69,7 @@ luarocks make kong-plugin-ipgeolocation-0.1.0-1.rockspec
 
 ### Install in a Docker image
 
-Build an image with the plugin baked in from [`examples/docker/Dockerfile`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/docker/Dockerfile).:
+Build an image with the plugin baked in from [`examples/docker/Dockerfile`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/docker/Dockerfile):
 
 ```sh
 docker build -f examples/docker/Dockerfile -t kong-ipgeolocation .

@@ -6,7 +6,7 @@ All notable changes are documented in this file. The format follows
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-10-01
+## [0.1.0] - 2026-10-05
 
 ### Added
 
