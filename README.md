@@ -606,7 +606,6 @@ Kong and format references:
 
 - [Kong Gateway documentation](https://developer.konghq.com/gateway/)
 - [Kong Pongo](https://github.com/Kong/kong-pongo), the plugin test harness used by this repository
-- [MaxMind DB file format specification](https://maxmind.github.io/MaxMind-DB/)
 
 ## License
 
