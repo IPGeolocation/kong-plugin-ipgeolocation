@@ -18,3 +18,5 @@ __pycache__/
 *.pyc
 .vscode/
 .idea/
+#Testing
+manual-testing

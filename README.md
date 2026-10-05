@@ -436,7 +436,7 @@ Each log entry then has an `ipgeolocation` object with the country, city, ASN, t
 
 ## Keeping databases up to date
 
-IPGeolocation.io updates its databases daily. [`examples/updater/ipgeolocation-update.sh`](https://github.com/Kong/kong-plugin-ipgeolocation/blob/main/examples/updater/ipgeolocation-update.sh) downloads them, checks `checksum.txt`, optionally checks IPGeolocation.io's signature with their public key, validates each file and installs it. Give it the download links through the `IPGEO_URLS` environment variable from a secret. It never writes the links' query strings, which hold your API key, to its log.
+IPGeolocation.io updates its databases daily. [`examples/updater/ipgeolocation-update.sh`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/updater/ipgeolocation-update.sh) downloads them, checks `checksum.txt`, optionally checks IPGeolocation.io's signature with their public key, validates each file and installs it. Give it the download links through the `IPGEO_URLS` environment variable from a secret. It never writes the links' query strings, which hold your API key, to its log.
 
 > [!IMPORTANT]
 > Replace a database file atomically, never edit it in place. Download to a temporary file in the same directory, check it, then rename it over the old file. Truncating or rewriting a file that Kong has mapped can serve torn data or crash workers with `SIGBUS`. The updater script does this for you, and the plugin logs a warning when it sees a file modified in place.
@@ -486,7 +486,7 @@ Inside Kong (one worker, `ab` on the same vCPU, Kong answering directly with `re
 
 About half of the `standard` figure is database work, a fifth is setting 15 headers, and the rest is header stripping and Kong's own per plugin work. To keep the cost down, request only the headers your services use, and use `preset: none` where you only need the policy.
 
-Opening 305 MiB of databases added 1.2 MiB of resident memory. Pages are read on demand and shared by all workers through the page cache, so plan for the page cache to hold the parts of your databases that traffic touches. For heavy and varied traffic that can be their full size, and the full Security Database is several GiB. [`bench/bench.lua`](https://github.com/Kong/kong-plugin-ipgeolocation/blob/main/bench/bench.lua) reproduces the database measurements on your own databases and hardware.
+Opening 305 MiB of databases added 1.2 MiB of resident memory. Pages are read on demand and shared by all workers through the page cache, so plan for the page cache to hold the parts of your databases that traffic touches. For heavy and varied traffic that can be their full size, and the full Security Database is several GiB. [`bench/bench.lua`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/bench/bench.lua) reproduces the database measurements on your own databases and hardware.
 
 ## Troubleshooting
 
