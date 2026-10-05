@@ -61,6 +61,16 @@ Install the plugin on every Kong node that runs it. In hybrid mode that includes
 
 ### Install with LuaRocks
 
+The plugin is published on [LuaRocks](https://luarocks.org/modules/ipgeolocation/kong-plugin-ipgeolocation):
+
+```sh
+luarocks install kong-plugin-ipgeolocation
+```
+
+LuaRocks needs `curl` or `wget` to download. The official `kong` Docker image ships with neither, and LuaRocks then fails with the misleading `No results matching query were found for Lua 5.1`. Install `curl` first, or use the [Docker image](#install-in-a-docker-image) below.
+
+To install from a checkout instead:
+
 ```sh
 git clone https://github.com/IPGeolocation/kong-plugin-ipgeolocation.git
 cd kong-plugin-ipgeolocation
