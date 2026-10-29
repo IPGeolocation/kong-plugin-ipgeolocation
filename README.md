@@ -598,7 +598,7 @@ IPGeolocation.io tools:
 - [Nginx module](https://github.com/IPGeolocation/ngx_http_ipgeolocation_module), the same databases as native nginx variables ([documentation](https://ipgeolocation.io/documentation/nginx-integration))
 - [Traefik plugin](https://github.com/IPGeolocation/traefik-plugin-ipgeolocation), the same databases as a Traefik middleware
 - [mmdbio](https://github.com/IPGeolocation/mmdbio), a command line tool for reading and inspecting MMDB files
-- [IPGeolocation CLI](https://github.com/IPGeolocation/cli), IP intelligence from your terminal and shell scripts
+- [IPGeolocation.io CLI](https://github.com/IPGeolocation/cli), IP intelligence from your terminal and shell scripts
 - [Integration guides](https://github.com/IPGeolocation/ipgeolocation-guides), setup guides for every integration
 - [All repositories](https://github.com/IPGeolocation)
 
