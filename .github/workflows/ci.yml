@@ -56,7 +56,7 @@ jobs:
         run: |
           pongo up
           pongo build
-          pongo exec kong version | tee "$RUNNER_TEMP/kong-version.txt"
+          pongo shell kong version | tee "$RUNNER_TEMP/kong-version.txt"
           grep -Eq '^3\.9\.4([[:space:]]|$)' "$RUNNER_TEMP/kong-version.txt"
           pongo run spec/integration
 
