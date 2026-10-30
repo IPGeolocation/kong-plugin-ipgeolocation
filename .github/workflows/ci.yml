@@ -50,8 +50,18 @@ jobs:
       - name: Prepare Kong test files
         run: |
           printf '%s\n' '${{ matrix.kong_version }}' >> kong-pongo/assets/kong_CE_versions.ver
-          git clone --depth 1 --branch '${{ matrix.kong_version }}' https://github.com/Kong/kong.git 'kong-pongo/kong-versions/${{ matrix.kong_version }}/kong'
-          test "$(git -C 'kong-pongo/kong-versions/${{ matrix.kong_version }}/kong' rev-parse HEAD)" = ddc85be461165c9eb4506669343aa0d0c627e687
+          kong_source_dir="$RUNNER_TEMP/kong-source"
+          kong_test_files='kong-pongo/kong-versions/${{ matrix.kong_version }}/kong'
+          git clone --depth 1 --branch '${{ matrix.kong_version }}' https://github.com/Kong/kong.git "$kong_source_dir"
+          test "$(git -C "$kong_source_dir" rev-parse HEAD)" = ddc85be461165c9eb4506669343aa0d0c627e687
+          mkdir -p "$kong_test_files/spec"
+          cp "$kong_source_dir/Makefile" "$kong_test_files/"
+          cp -R "$kong_source_dir/bin" "$kong_test_files/"
+          for artifact in "$kong_source_dir"/spec/*; do
+            case "$artifact" in */spec/[0-9]*) continue ;; esac
+            cp -R "$artifact" "$kong_test_files/spec/"
+          done
+          test ! -e "$kong_test_files/kong"
       - name: Integration tests
         run: |
           pongo up
