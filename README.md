@@ -51,7 +51,7 @@ The files are memory mapped. The kernel shares the mapped pages between all work
 
 ## Requirements
 
-- Kong Gateway 3.x on Linux. Tested end to end on Kong Gateway OSS 3.9.3 (DB-less) and with Kong's test harness on 3.9.2 against PostgreSQL and DB-less. Kong Gateway 3.10 LTS and 3.14 LTS use the same plugin APIs and are expected to work, but have not been tested yet.
+- Kong Gateway 3.x on Linux. Tested end to end on Kong Gateway OSS 3.9.4 (DB-less) and with Kong's test harness on 3.9.4 against PostgreSQL and DB-less. Kong Gateway 3.10 LTS and 3.14 LTS use the same plugin APIs and are expected to work, but have not been tested yet.
 - One or more IPGeolocation.io [`.mmdb` databases](#getting-the-databases).
 - Read access to the database files for Kong's worker user (`kong` in the official packages and images), including every directory above them.
 

@@ -34,16 +34,41 @@ jobs:
   integration:
     name: Integration, Kong ${{ matrix.kong_version }} (Pongo)
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        kong_version: ["3.9.x"]
+        kong_version: ["3.9.4"]
     steps:
       - uses: actions/checkout@v4
-      - uses: Kong/kong-pongo-action@v1
+      - uses: Kong/kong-pongo-action@5972effad7a566aed12b879b559bbff07d258d51
         with:
           kong_version: ${{ matrix.kong_version }}
-      - run: pongo run spec/integration
+          pongo_version: "2.30.0"
+          build_image: "false"
+          start_environment: "false"
+      - name: Prepare Kong test files
+        run: |
+          printf '%s\n' '${{ matrix.kong_version }}' >> kong-pongo/assets/kong_CE_versions.ver
+          kong_source_dir="$RUNNER_TEMP/kong-source"
+          kong_test_files='kong-pongo/kong-versions/${{ matrix.kong_version }}/kong'
+          git clone --depth 1 --branch '${{ matrix.kong_version }}' https://github.com/Kong/kong.git "$kong_source_dir"
+          test "$(git -C "$kong_source_dir" rev-parse HEAD)" = ddc85be461165c9eb4506669343aa0d0c627e687
+          mkdir -p "$kong_test_files/spec"
+          cp "$kong_source_dir/Makefile" "$kong_test_files/"
+          cp -R "$kong_source_dir/bin" "$kong_test_files/"
+          for artifact in "$kong_source_dir"/spec/*; do
+            case "$artifact" in */spec/[0-9]*) continue ;; esac
+            cp -R "$artifact" "$kong_test_files/spec/"
+          done
+          test ! -e "$kong_test_files/kong"
+      - name: Integration tests
+        run: |
+          pongo up
+          pongo build
+          pongo shell kong version | tee "$RUNNER_TEMP/kong-version.txt"
+          grep -Eq '^3\.9\.4([[:space:]]|$)' "$RUNNER_TEMP/kong-version.txt"
+          pongo run spec/integration
 
   integration-enterprise:
     name: Integration, Kong Enterprise ${{ matrix.kong_version }} (Pongo)
@@ -96,6 +121,37 @@ jobs:
           mkdir -p "$KONG_PREFIX"
           kong config parse examples/kong.yml
           kong config parse examples/docker/kong.yml
+
+  updater:
+    name: Updater image and verification tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build updater image
+        run: |
+          docker build --pull --no-cache -t ipgeolocation-updater:test examples/updater
+          docker run --rm --entrypoint cat ipgeolocation-updater:test /etc/alpine-release
+          docker run --rm --entrypoint apk ipgeolocation-updater:test info -v
+      - name: Generate database fixtures
+        run: |
+          mkdir -p "$RUNNER_TEMP/ipgeo-fixtures"
+          docker run --rm --user root --entrypoint resty -v "$PWD:/plugin:ro" -v "$RUNNER_TEMP/ipgeo-fixtures:/fixtures" kong:3.9.4 \
+            -I /plugin -e 'require("spec.ipgeolocation.fixtures").build_all("/fixtures")'
+      - name: Test updater in the image
+        env:
+          UPDATER_IMAGE: ipgeolocation-updater:test
+          UPDATER_FIXTURES: ${{ runner.temp }}/ipgeo-fixtures
+        run: python3 -m unittest discover -s spec/updater -v
+      - name: Scan updater image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          version: v0.76.1
+          image-ref: ipgeolocation-updater:test
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          ignore-unfixed: false
+          exit-code: 1
 
   crosscheck:
     name: Reader cross-check on IPGeolocation.io databases
