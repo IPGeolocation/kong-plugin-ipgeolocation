@@ -434,15 +434,16 @@ plugins:
     config:
       databases:
         - /usr/local/share/ipgeolocation/db-ip-location.mmdb
+        - /usr/local/share/ipgeolocation/db-ip-asn.mmdb
         - /usr/local/share/ipgeolocation/db-ip-security.mmdb
-      headers: { preset: none }
+      headers: { preset: standard }
       log_serialize: true
   - name: file-log
     config:
       path: /var/log/kong/requests.log
 ```
 
-Each log entry then has an `ipgeolocation` object with the country, city, ASN, threat score and flags of the client.
+Each log entry then has an `ipgeolocation` object with the country, city, ASN, threat score and VPN, proxy and Tor flags of the client. The object carries only the fields the plugin resolves for its headers and policy, so `preset: none` without a policy logs no fields.
 
 ## Keeping databases up to date
 
