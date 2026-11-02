@@ -283,7 +283,7 @@ Validation rejects relative paths, `..` segments, refresh intervals between 1 an
 
 ## Request headers
 
-Header names are `X-IPGeo-` followed by the field name in title case, with common acronyms in capitals. `country_code` becomes `X-IPGeo-Country-Code`, `is_vpn` becomes `X-IPGeo-Is-VPN` and `asn` becomes `X-IPGeo-ASN`. These are the headers the Traefik plugin sets.
+Header names are `X-IPGeo-` followed by the field name in title case, with common acronyms in capitals. `country_code` becomes `X-IPGeo-Country-Code`, `is_vpn` becomes `X-IPGeo-Is-VPN` and `asn` becomes `X-IPGeo-ASN`. These are the headers the Kong plugin sets.
 
 | Preset | Headers |
 |---|---|
