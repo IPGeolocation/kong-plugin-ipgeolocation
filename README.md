@@ -389,7 +389,7 @@ local geo = kong.ctx.shared.ipgeolocation
 -- geo.blocked, geo.dry_run, geo.reason   the policy decision
 ```
 
-Treat it as read only. These combinations are covered by the end to end tests:
+Treat it as read only. These combinations are covered by the end-to-end tests:
 
 - Rate limiting per country: `rate-limiting` with `limit_by: header` and `header_name: X-IPGeo-Country-Code`.
 - Renaming headers: `request-transformer`, for example `rename.headers: ["X-IPGeo-City-Name:X-City"]`.
@@ -590,7 +590,7 @@ pongo run spec/integration       # Kong's test harness: schema and proxy behavio
 python3 spec/e2e/e2e.py          # a real Kong (kong and resty on PATH), end to end
 ```
 
-[docs/DEVELOPMENT.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/DEVELOPMENT.md) covers the code layout, the test fixtures, the cross check against `python-maxminddb`, benchmarks and the release process. Contributions are welcome, see [CONTRIBUTING.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/CONTRIBUTING.md). Report vulnerabilities as described in [SECURITY.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/SECURITY.md), and read [docs/SECURITY_REVIEW.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/SECURITY_REVIEW.md) for the threat model.
+[docs/DEVELOPMENT.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/DEVELOPMENT.md) covers the code layout, the test fixtures, the cross-check against `python-maxminddb`, benchmarks and the release process. Contributions are welcome, see [CONTRIBUTING.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/CONTRIBUTING.md). Report vulnerabilities as described in [SECURITY.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/SECURITY.md), and read [docs/SECURITY_REVIEW.md](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/docs/SECURITY_REVIEW.md) for the threat model.
 
 ## Related tools and links
 
