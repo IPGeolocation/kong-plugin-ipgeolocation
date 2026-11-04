@@ -203,7 +203,7 @@ Download the `.mmdb` files from your [IPGeolocation.io account](https://app.ipge
 
 | Database | File | What it adds |
 | --- | --- | --- |
-| [IP Geolocation](https://ipgeolocation.io/ip-geolocation-database.html) | `db-ip-location.mmdb` or `db-ip-city.mmdb` | country, state, district, city, postal code, coordinates, time zone, currency; the Advance tier adds accuracy radius, confidence and connection type |
+| [IP Geolocation](https://ipgeolocation.io/ip-geolocation-database.html) | `db-ip-location.mmdb` or `db-ip-city.mmdb` | country, state, district, city, postal code, coordinates, time zone, currency; the Geo Advanced tier adds accuracy radius, confidence and connection type |
 | [Country](https://ipgeolocation.io/geo-standard-databases.html) | `db-ip-country.mmdb` | country, continent and currency, in a smaller file |
 | [ISP](https://ipgeolocation.io/geo-standard-databases.html) | `db-ip-isp.mmdb` or `db-ip-city-isp.mmdb` | ISP, ASN and connection type, with country or full location |
 | [IP Security](https://ipgeolocation.io/ip-security-database.html) | `db-ip-security.mmdb` | threat score, Tor, VPN, proxy, relay, residential proxy, bot, spam, attacker, cloud and corporate gateway flags |
