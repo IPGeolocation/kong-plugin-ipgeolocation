@@ -616,7 +616,7 @@ Account, data and support:
 Kong and format references:
 
 - [Kong Gateway documentation](https://developer.konghq.com/gateway/)
-- [Kong Pongo](https://github.com/Kong/kong-pongo), the plugin test harness used by this repository
+- [Kong Pongo](https://github.com/Kong/kong-pongo), the plugin test harness used by the plugin's tests
 
 ## License
 
