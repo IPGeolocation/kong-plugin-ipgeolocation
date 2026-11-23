@@ -74,7 +74,7 @@ To install from a checkout instead:
 ```sh
 git clone https://github.com/IPGeolocation/kong-plugin-ipgeolocation.git
 cd kong-plugin-ipgeolocation
-luarocks make kong-plugin-ipgeolocation-0.1.0-1.rockspec
+luarocks make kong-plugin-ipgeolocation-0.2.0-1.rockspec
 ```
 
 ### Install in a Docker image

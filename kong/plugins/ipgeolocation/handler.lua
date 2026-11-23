@@ -38,7 +38,7 @@ local last_failure_log = 0
 
 local IPGeolocationHandler = {
   PRIORITY = 2450,   -- after bot-detection (2500), before cors and authentication
-  VERSION = "0.1.0",
+  VERSION = "0.2.0",
 }
 
 function IPGeolocationHandler:configure(configs)

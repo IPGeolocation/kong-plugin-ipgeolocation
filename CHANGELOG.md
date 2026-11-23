@@ -6,6 +6,8 @@ All notable changes are documented in this file. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-23
+
 ### Fixed
 
 - Residential Proxy Database version 2 renamed `proxy_provider` to the `proxy_providers` list. The plugin
@@ -49,5 +51,6 @@ All notable changes are documented in this file. The format follows
 - Unit, integration (Pongo) and end-to-end tests; benchmarks; a reader cross-check against
   `python-maxminddb`; examples for DB-less, Docker and Kubernetes; a database updater.
 
-[Unreleased]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/releases/tag/v0.1.0
