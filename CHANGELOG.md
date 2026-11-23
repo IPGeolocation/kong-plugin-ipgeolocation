@@ -6,6 +6,25 @@ All notable changes are documented in this file. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-23
+
+### Fixed
+
+- Residential Proxy Database version 2 renamed `proxy_provider` to the `proxy_providers` list. The plugin
+  now reads it: `residential_proxy_provider` holds every provider, `proxy_provider` falls back to it, and
+  `is_residential_proxy` is true again for addresses that are only in a version 2 file. Version 1 files
+  still work.
+
+### Added
+
+- `proxy_days_seen_7d`, `proxy_days_seen_30d` and `proxy_provider_count_30d` (headers
+  `X-IPGeo-Proxy-Days-Seen-7d`, `X-IPGeo-Proxy-Days-Seen-30d`, `X-IPGeo-Proxy-Provider-Count-30d`), from
+  the Security Database or Residential Proxy Database version 2. They are in the `full` preset.
+
+### Changed
+
+- `residential_proxy_provider` is a list field, since version 2 files can name several providers.
+
 ## [0.1.0] - 2026-10-05
 
 ### Added
@@ -32,5 +51,6 @@ All notable changes are documented in this file. The format follows
 - Unit, integration (Pongo) and end-to-end tests; benchmarks; a reader cross-check against
   `python-maxminddb`; examples for DB-less, Docker and Kubernetes; a database updater.
 
-[Unreleased]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/IPGeolocation/kong-plugin-ipgeolocation/releases/tag/v0.1.0

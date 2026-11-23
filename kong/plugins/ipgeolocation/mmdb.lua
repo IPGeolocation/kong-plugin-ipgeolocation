@@ -75,7 +75,7 @@ local ARRAY_MT = { __name = "mmdb.array" }
 
 local ERR_IPV6_IN_IPV4 = "IPv6 lookup in an IPv4-only database"
 
-local _M = { _VERSION = "0.1.0", array_mt = ARRAY_MT, ERR_IPV6_IN_IPV4 = ERR_IPV6_IN_IPV4 }
+local _M = { _VERSION = "0.2.0", array_mt = ARRAY_MT, ERR_IPV6_IN_IPV4 = ERR_IPV6_IN_IPV4 }
 
 local function errstr(errno)
   local s = C.strerror(errno)

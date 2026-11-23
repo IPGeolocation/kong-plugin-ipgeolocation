@@ -74,7 +74,7 @@ To install from a checkout instead:
 ```sh
 git clone https://github.com/IPGeolocation/kong-plugin-ipgeolocation.git
 cd kong-plugin-ipgeolocation
-luarocks make kong-plugin-ipgeolocation-0.1.0-1.rockspec
+luarocks make kong-plugin-ipgeolocation-0.2.0-1.rockspec
 ```
 
 ### Install in a Docker image
@@ -206,11 +206,11 @@ Download the `.mmdb` files from your [IPGeolocation.io account](https://app.ipge
 | [IP Geolocation](https://ipgeolocation.io/ip-geolocation-database.html) | `db-ip-location.mmdb` or `db-ip-city.mmdb` | country, state, district, city, postal code, coordinates, time zone, currency; the Geo Advanced tier adds accuracy radius, confidence and connection type |
 | [Country](https://ipgeolocation.io/geo-standard-databases.html) | `db-ip-country.mmdb` | country, continent and currency, in a smaller file |
 | [ISP](https://ipgeolocation.io/geo-standard-databases.html) | `db-ip-isp.mmdb` or `db-ip-city-isp.mmdb` | ISP, ASN and connection type, with country or full location |
-| [IP Security](https://ipgeolocation.io/ip-security-database.html) | `db-ip-security.mmdb` | threat score, Tor, VPN, proxy, relay, residential proxy, bot, spam, attacker, cloud and corporate gateway flags |
+| [IP Security](https://ipgeolocation.io/ip-security-database.html) | `db-ip-security.mmdb` | threat score, Tor, VPN, proxy, relay, residential proxy, bot, spam, attacker, cloud and corporate gateway flags, and proxy activity counts |
 | [IP Company](https://ipgeolocation.io/ip-company-database.html) | `db-ip-company.mmdb` | company or ISP name, domain and type |
 | [IP to ASN](https://ipgeolocation.io/ip-asn-database.html) | `db-ip-asn.mmdb` | AS number, name, organization, type and domain; the Extended tier adds RIR, allocation, routes and peers |
 | [IP Abuse Contact](https://ipgeolocation.io/ip-abuse-contact-database.html) | `db-ip-abuse.mmdb` | abuse email, phone, address, route and country |
-| [Residential Proxy](https://ipgeolocation.io/residential-proxy-database.html) | `db-residential-proxy.mmdb` | residential proxy provider and last-seen date |
+| [Residential Proxy](https://ipgeolocation.io/residential-proxy-database.html) | `db-residential-proxy.mmdb` | residential proxy providers, last-seen date, and 7-day and 30-day proxy activity counts |
 | [IP Hosting](https://ipgeolocation.io/ip-hosting-database.html) | `db-ip-hosting.mmdb` | hosting provider name |
 
 Combined products ship two files in one archive, for example City + Security as `db-ip-city.mmdb` and `db-ip-security.mmdb`. List both files. Some combined files hold several data sets in one file, such as `db-ip-city-company-asn.mmdb`.

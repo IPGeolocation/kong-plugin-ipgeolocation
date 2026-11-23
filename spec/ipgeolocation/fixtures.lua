@@ -107,7 +107,9 @@ _M.security = {
                                    vpn_confidence_score = 99, vpn_last_seen = "2026-09-20" }),
   ["203.0.113.12/32"] = security({ is_proxy = "true", is_residential_proxy = "true", is_anonymous = "true",
                                    threat_score = 45, proxy_provider_names = W.array({ "Oxy Labs", "Geonode" }),
-                                   proxy_confidence_score = 99, proxy_last_seen = "2026-09-11" }),
+                                   proxy_confidence_score = 99, proxy_last_seen = "2026-09-11",
+                                   proxy_days_seen_7d = W.uint16(3), proxy_days_seen_30d = W.uint16(12),
+                                   proxy_provider_count_30d = W.uint16(4) }),
   ["203.0.113.13/32"] = security({ is_known_attacker = "true", threat_score = 95 }),
   ["203.0.113.14/32"] = security({ is_bot = "true", is_known_good_bot = "true", bot_type = "search_engine",
                                    bot_operator_name = "Example Search", bot_confidence_score = 99, threat_score = 5 }),
@@ -170,6 +172,13 @@ _M.residential = {
   ["203.0.113.30/32"] = { last_seen = "2026-09-08", proxy_provider = "Example Residential Proxies" },
 }
 
+-- Residential Proxy Database v2: proxy_providers is a list, plus activity counts.
+_M.residential_v2 = {
+  ["203.0.113.32/32"] = { last_seen = "2026-11-07", proxy_providers = W.array({ "Proxy-Seller", "ProxyWing" }),
+                          proxy_days_seen_7d = W.uint16(2), proxy_days_seen_30d = W.uint16(5),
+                          proxy_provider_count_30d = W.uint16(2) },
+}
+
 _M.hosting = {
   ["203.0.113.31/32"] = { hosting_provider = "Example Hosting Inc." },
 }
@@ -190,6 +199,7 @@ local SPECS = {
   isp = { data = "isp", record_size = 32 },
   bundle = { data = "bundle", record_size = 32 },
   residential = { data = "residential", record_size = 32, database_type = "ipgeolocation.io Residential Database" },
+  residential_v2 = { data = "residential_v2", record_size = 32, database_type = "ipgeolocation.io Residential Database" },
   hosting = { data = "hosting", record_size = 24, database_type = "ipgeolocation.io IP Hosting Database" },
   abuse = { data = "abuse", record_size = 32 },
 }

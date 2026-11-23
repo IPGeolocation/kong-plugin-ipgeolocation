@@ -58,9 +58,15 @@ A product download is a ZIP archive with one or two `.mmdb` files. List every fi
 | `db-ip-city-company-asn.mmdb` | City + Company + ASN; City + Company + ASN + Security | the Advance Location, Company and ASN fields; some releases also carry the ASN Extended fields |
 | `db-ip-city-company-asn-abuse.mmdb` | City + Company + ASN + Abuse; City + Company + ASN + Abuse + Security | the Advance Location, Company, ASN and Abuse fields |
 | `db-ip-abuse.mmdb` | Abuse Contact | `abuse_name`, `abuse_email`, `abuse_phone`, `abuse_address`, `abuse_country_code`, `abuse_kind`, `abuse_route` |
-| `db-ip-security.mmdb` | Security Database, and every product that includes Security | `threat_score`, `is_tor`, `is_proxy`, `is_vpn`, `is_relay`, `is_residential_proxy`, `is_anonymous`, `is_known_attacker`, `is_bot`, `is_spam`, `is_cloud_provider`, `cloud_provider`, `proxy_provider`, `vpn_provider`, `relay_provider`, `proxy_confidence`, `vpn_confidence`, `proxy_last_seen`, `vpn_last_seen`, `is_known_good_bot`, `bot_type`, `bot_operator`, `bot_confidence`, `bot_last_seen`, `is_corporate_gateway`, `corporate_gateway_provider`, `corporate_gateway_type` |
+| `db-ip-security.mmdb` | Security Database, and every product that includes Security | `threat_score`, `is_tor`, `is_proxy`, `is_vpn`, `is_relay`, `is_residential_proxy`, `is_anonymous`, `is_known_attacker`, `is_bot`, `is_spam`, `is_cloud_provider`, `cloud_provider`, `proxy_provider`, `vpn_provider`, `relay_provider`, `proxy_confidence`, `vpn_confidence`, `proxy_last_seen`, `vpn_last_seen`, `proxy_days_seen_7d`, `proxy_days_seen_30d`, `proxy_provider_count_30d`, `is_known_good_bot`, `bot_type`, `bot_operator`, `bot_confidence`, `bot_last_seen`, `is_corporate_gateway`, `corporate_gateway_provider`, `corporate_gateway_type` |
 | `db-ip-hosting.mmdb` | Hosting | `is_cloud_provider`, `hosting_provider` |
-| `db-residential-proxy.mmdb` | Residential Proxy | `is_residential_proxy`, `proxy_provider`, `residential_proxy_provider`, `residential_proxy_last_seen` |
+| `db-residential-proxy.mmdb` | Residential Proxy | `is_residential_proxy`, `proxy_provider`, `residential_proxy_provider`, `residential_proxy_last_seen`; version 2 also `proxy_days_seen_7d`, `proxy_days_seen_30d`, `proxy_provider_count_30d` |
+
+Residential Proxy files from version 2 on list every provider seen on a range in `proxy_providers` and add
+the activity counts; version 1 files have a single `proxy_provider`. The plugin reads both, so
+`residential_proxy_provider` holds every provider (joined with `headers.list_separator`). The Security
+Database stores the same three counts under the same names; when both databases are loaded, the first one
+listed wins.
 
 A field is listed when the file stores it. Some fields are empty in most records (for example
 `relay_provider`, `bot_operator` and the corporate gateway details), so their headers appear only for the
