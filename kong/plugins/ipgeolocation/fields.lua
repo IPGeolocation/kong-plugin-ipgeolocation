@@ -110,7 +110,7 @@ def("security", "is_proxy", BOOL, { "is_proxy", "security.is_proxy" })
 def("security", "is_vpn", BOOL, { "is_vpn", "security.is_vpn" })
 def("security", "is_relay", BOOL, { "is_relay", "security.is_relay" })
 def("security", "is_residential_proxy", BOOL, { "is_residential_proxy", "security.is_residential_proxy" },
-    { presence = { "proxy_provider", "residential_proxy.provider_name", "residential_proxy_provider_name" } })
+    { presence = { "proxy_providers", "proxy_provider", "residential_proxy.provider_name", "residential_proxy_provider_name" } })
 def("security", "is_anonymous", BOOL, { "is_anonymous", "security.is_anonymous" })
 def("security", "is_known_attacker", BOOL, { "is_known_attacker", "security.is_known_attacker" })
 def("security", "is_bot", BOOL, { "is_bot", "security.is_bot" })
@@ -119,13 +119,18 @@ def("security", "is_cloud_provider", BOOL, { "is_cloud_provider", "security.is_c
     { presence = { "hosting_provider", "hosting.provider_name" } })
 def("security", "cloud_provider", STRING, { "cloud_provider_name", "security.cloud_provider_name", "security.cloud_provider", "cloud_provider" })
 def("security", "proxy_type", STRING, { "proxy_type", "security.proxy_type" })
-def("security", "proxy_provider", LIST, { "proxy_provider_names", "security.proxy_provider_names", "security.proxy_provider", "proxy_provider" })
+def("security", "proxy_provider", LIST, { "proxy_provider_names", "security.proxy_provider_names", "security.proxy_provider", "proxy_providers", "proxy_provider" })
 def("security", "vpn_provider", LIST, { "vpn_provider_names", "security.vpn_provider_names", "security.vpn_provider", "vpn_provider" })
 def("security", "relay_provider", STRING, { "relay_provider_name", "security.relay_provider_name", "security.relay_provider", "relay_provider" })
 def("security", "proxy_confidence", NUMBER, { "proxy_confidence_score", "security.proxy_confidence_score" })
 def("security", "vpn_confidence", NUMBER, { "vpn_confidence_score", "security.vpn_confidence_score" })
 def("security", "proxy_last_seen", STRING, { "proxy_last_seen", "security.proxy_last_seen" })
 def("security", "vpn_last_seen", STRING, { "vpn_last_seen", "security.vpn_last_seen" })
+-- Proxy activity counts. The Security Database and the Residential Proxy
+-- Database v2 use the same field names; the first database listed wins.
+def("security", "proxy_days_seen_7d", NUMBER, { "proxy_days_seen_7d", "security.proxy_days_seen_7d" })
+def("security", "proxy_days_seen_30d", NUMBER, { "proxy_days_seen_30d", "security.proxy_days_seen_30d" })
+def("security", "proxy_provider_count_30d", NUMBER, { "proxy_provider_count_30d", "security.proxy_provider_count_30d" })
 
 -- Bot detail and corporate gateways. Present in current IPGeolocation.io
 -- Security Database releases; resolved when the database has them, empty
@@ -140,8 +145,9 @@ def("security", "is_corporate_gateway", BOOL, { "is_corporate_gateway", "securit
 def("security", "corporate_gateway_provider", STRING, { "corporate_gateway_provider_name", "security.corporate_gateway_provider_name" })
 def("security", "corporate_gateway_type", STRING, { "corporate_gateway_type", "security.corporate_gateway_type" })
 
--- Residential proxy and hosting databases
-def("security", "residential_proxy_provider", STRING, { "residential_proxy.provider_name", "residential_proxy_provider_name", "proxy_provider", "security.proxy_provider" })
+-- Residential proxy and hosting databases. Residential Proxy Database v2
+-- lists every provider in proxy_providers; v1 had a single proxy_provider.
+def("security", "residential_proxy_provider", LIST, { "residential_proxy.provider_name", "residential_proxy_provider_name", "proxy_providers", "security.proxy_providers", "proxy_provider", "security.proxy_provider" })
 def("security", "residential_proxy_last_seen", STRING, { "residential_proxy.last_seen", "residential_proxy_last_seen", "last_seen", "security.last_seen" })
 def("security", "hosting_provider", STRING, { "hosting_provider", "security.hosting_provider", "hosting.provider_name", "hosting.provider", "hosting.name" })
 

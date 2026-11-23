@@ -77,7 +77,7 @@ in `standard`, which is contained in `full`). "custom only" fields must be mappe
 | `is_proxy` | `X-IPGeo-Is-Proxy` | boolean | standard | `is_proxy`, `security.is_proxy` |
 | `is_vpn` | `X-IPGeo-Is-VPN` | boolean | standard | `is_vpn`, `security.is_vpn` |
 | `is_relay` | `X-IPGeo-Is-Relay` | boolean | full | `is_relay`, `security.is_relay` |
-| `is_residential_proxy` | `X-IPGeo-Is-Residential-Proxy` | boolean | full | `is_residential_proxy`, `security.is_residential_proxy`, presence of `proxy_provider`, presence of `residential_proxy.provider_name`, presence of `residential_proxy_provider_name` |
+| `is_residential_proxy` | `X-IPGeo-Is-Residential-Proxy` | boolean | full | `is_residential_proxy`, `security.is_residential_proxy`, presence of `proxy_providers`, presence of `proxy_provider`, presence of `residential_proxy.provider_name`, presence of `residential_proxy_provider_name` |
 | `is_anonymous` | `X-IPGeo-Is-Anonymous` | boolean | full | `is_anonymous`, `security.is_anonymous` |
 | `is_known_attacker` | `X-IPGeo-Is-Known-Attacker` | boolean | full | `is_known_attacker`, `security.is_known_attacker` |
 | `is_bot` | `X-IPGeo-Is-Bot` | boolean | full | `is_bot`, `security.is_bot` |
@@ -85,13 +85,16 @@ in `standard`, which is contained in `full`). "custom only" fields must be mappe
 | `is_cloud_provider` | `X-IPGeo-Is-Cloud-Provider` | boolean | full | `is_cloud_provider`, `security.is_cloud_provider`, presence of `hosting_provider`, presence of `hosting.provider_name` |
 | `cloud_provider` | `X-IPGeo-Cloud-Provider` | text | full | `cloud_provider_name`, `security.cloud_provider_name`, `security.cloud_provider`, `cloud_provider` |
 | `proxy_type` | `X-IPGeo-Proxy-Type` | text | full | `proxy_type`, `security.proxy_type` |
-| `proxy_provider` | `X-IPGeo-Proxy-Provider` | list | full | `proxy_provider_names`, `security.proxy_provider_names`, `security.proxy_provider`, `proxy_provider` |
+| `proxy_provider` | `X-IPGeo-Proxy-Provider` | list | full | `proxy_provider_names`, `security.proxy_provider_names`, `security.proxy_provider`, `proxy_providers`, `proxy_provider` |
 | `vpn_provider` | `X-IPGeo-VPN-Provider` | list | full | `vpn_provider_names`, `security.vpn_provider_names`, `security.vpn_provider`, `vpn_provider` |
 | `relay_provider` | `X-IPGeo-Relay-Provider` | text | full | `relay_provider_name`, `security.relay_provider_name`, `security.relay_provider`, `relay_provider` |
 | `proxy_confidence` | `X-IPGeo-Proxy-Confidence` | number | full | `proxy_confidence_score`, `security.proxy_confidence_score` |
 | `vpn_confidence` | `X-IPGeo-VPN-Confidence` | number | full | `vpn_confidence_score`, `security.vpn_confidence_score` |
 | `proxy_last_seen` | `X-IPGeo-Proxy-Last-Seen` | text | full | `proxy_last_seen`, `security.proxy_last_seen` |
 | `vpn_last_seen` | `X-IPGeo-VPN-Last-Seen` | text | full | `vpn_last_seen`, `security.vpn_last_seen` |
+| `proxy_days_seen_7d` | `X-IPGeo-Proxy-Days-Seen-7d` | number | full | `proxy_days_seen_7d`, `security.proxy_days_seen_7d` |
+| `proxy_days_seen_30d` | `X-IPGeo-Proxy-Days-Seen-30d` | number | full | `proxy_days_seen_30d`, `security.proxy_days_seen_30d` |
+| `proxy_provider_count_30d` | `X-IPGeo-Proxy-Provider-Count-30d` | number | full | `proxy_provider_count_30d`, `security.proxy_provider_count_30d` |
 | `is_known_good_bot` | `X-IPGeo-Is-Known-Good-Bot` | boolean | full | `is_known_good_bot`, `security.is_known_good_bot` |
 | `bot_type` | `X-IPGeo-Bot-Type` | text | full | `bot_type`, `security.bot_type` |
 | `bot_operator` | `X-IPGeo-Bot-Operator` | text | full | `bot_operator_name`, `security.bot_operator_name`, `bot_owner_name`, `security.bot_owner_name` |
@@ -100,7 +103,7 @@ in `standard`, which is contained in `full`). "custom only" fields must be mappe
 | `is_corporate_gateway` | `X-IPGeo-Is-Corporate-Gateway` | boolean | full | `is_corporate_gateway`, `security.is_corporate_gateway` |
 | `corporate_gateway_provider` | `X-IPGeo-Corporate-Gateway-Provider` | text | full | `corporate_gateway_provider_name`, `security.corporate_gateway_provider_name` |
 | `corporate_gateway_type` | `X-IPGeo-Corporate-Gateway-Type` | text | full | `corporate_gateway_type`, `security.corporate_gateway_type` |
-| `residential_proxy_provider` | `X-IPGeo-Residential-Proxy-Provider` | text | full | `residential_proxy.provider_name`, `residential_proxy_provider_name`, `proxy_provider`, `security.proxy_provider` |
+| `residential_proxy_provider` | `X-IPGeo-Residential-Proxy-Provider` | list | full | `residential_proxy.provider_name`, `residential_proxy_provider_name`, `proxy_providers`, `security.proxy_providers`, `proxy_provider`, `security.proxy_provider` |
 | `residential_proxy_last_seen` | `X-IPGeo-Residential-Proxy-Last-Seen` | text | full | `residential_proxy.last_seen`, `residential_proxy_last_seen`, `last_seen`, `security.last_seen` |
 | `hosting_provider` | `X-IPGeo-Hosting-Provider` | text | full | `hosting_provider`, `security.hosting_provider`, `hosting.provider_name`, `hosting.provider`, `hosting.name` |
 
@@ -126,7 +129,7 @@ in `standard`, which is contained in `full`). "custom only" fields must be mappe
 
 - **minimal** (3): `country_code`, `city_name`, `asn`
 - **standard** (15): `country_code`, `country_name`, `continent_code`, `state_code`, `city_name`, `zip_code`, `latitude`, `longitude`, `time_zone`, `asn`, `organization_name`, `threat_score`, `is_vpn`, `is_proxy`, `is_tor`
-- **full** (82): `country_code`, `country_code3`, `country_code_ioc`, `country_name`, `country_name_official`, `country_capital`, `is_eu`, `continent_code`, `continent_name`, `currency_code`, `currency_name`, `currency_symbol`, `calling_code`, `languages`, `tld`, `state_code`, `state_name`, `district_name`, `city_name`, `zip_code`, `latitude`, `longitude`, `geoname_id`, `accuracy_radius`, `confidence`, `dma_code`, `time_zone`, `connection_type`, `company_name`, `company_domain`, `company_type`, `isp_name`, `organization_name`, `asn`, `asn_number`, `asn_name`, `asn_organization`, `asn_country`, `asn_domain`, `asn_type`, `asn_rir`, `asn_date_allocated`, `asn_allocation_status`, `threat_score`, `is_tor`, `is_proxy`, `is_vpn`, `is_relay`, `is_residential_proxy`, `is_anonymous`, `is_known_attacker`, `is_bot`, `is_spam`, `is_cloud_provider`, `cloud_provider`, `proxy_type`, `proxy_provider`, `vpn_provider`, `relay_provider`, `proxy_confidence`, `vpn_confidence`, `proxy_last_seen`, `vpn_last_seen`, `is_known_good_bot`, `bot_type`, `bot_operator`, `bot_confidence`, `bot_last_seen`, `is_corporate_gateway`, `corporate_gateway_provider`, `corporate_gateway_type`, `residential_proxy_provider`, `residential_proxy_last_seen`, `hosting_provider`, `abuse_name`, `abuse_email`, `abuse_phone`, `abuse_address`, `abuse_country_code`, `abuse_kind`, `abuse_route`, `ip`
+- **full** (85): `country_code`, `country_code3`, `country_code_ioc`, `country_name`, `country_name_official`, `country_capital`, `is_eu`, `continent_code`, `continent_name`, `currency_code`, `currency_name`, `currency_symbol`, `calling_code`, `languages`, `tld`, `state_code`, `state_name`, `district_name`, `city_name`, `zip_code`, `latitude`, `longitude`, `geoname_id`, `accuracy_radius`, `confidence`, `dma_code`, `time_zone`, `connection_type`, `company_name`, `company_domain`, `company_type`, `isp_name`, `organization_name`, `asn`, `asn_number`, `asn_name`, `asn_organization`, `asn_country`, `asn_domain`, `asn_type`, `asn_rir`, `asn_date_allocated`, `asn_allocation_status`, `threat_score`, `is_tor`, `is_proxy`, `is_vpn`, `is_relay`, `is_residential_proxy`, `is_anonymous`, `is_known_attacker`, `is_bot`, `is_spam`, `is_cloud_provider`, `cloud_provider`, `proxy_type`, `proxy_provider`, `vpn_provider`, `relay_provider`, `proxy_confidence`, `vpn_confidence`, `proxy_last_seen`, `vpn_last_seen`, `proxy_days_seen_7d`, `proxy_days_seen_30d`, `proxy_provider_count_30d`, `is_known_good_bot`, `bot_type`, `bot_operator`, `bot_confidence`, `bot_last_seen`, `is_corporate_gateway`, `corporate_gateway_provider`, `corporate_gateway_type`, `residential_proxy_provider`, `residential_proxy_last_seen`, `hosting_provider`, `abuse_name`, `abuse_email`, `abuse_phone`, `abuse_address`, `abuse_country_code`, `abuse_kind`, `abuse_route`, `ip`
 
 `full` excludes unbounded lists (`asn_routes`, `asn_peers`, `asn_upstreams`, `asn_downstreams`), which can
 hold thousands of entries; map them with `headers.custom` if you need them (values are truncated to

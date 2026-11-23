@@ -173,6 +173,28 @@ describe("resolver", function()
     assert.is_true(v.is_residential_proxy)
   end)
 
+  it("reads Residential Proxy Database v2: every provider and the activity counts", function()
+    local v, t = resolve({ fx.residential_v2 }, "203.0.113.32")
+    assert.is_true(v.is_residential_proxy)           -- by presence of proxy_providers
+    assert.same({ "Proxy-Seller", "ProxyWing" }, v.residential_proxy_provider)
+    assert.equal("Proxy-Seller,ProxyWing", t.residential_proxy_provider)
+    assert.same({ "Proxy-Seller", "ProxyWing" }, v.proxy_provider)
+    assert.equal("2026-11-07", v.residential_proxy_last_seen)
+    assert.equal(2, v.proxy_days_seen_7d)
+    assert.equal(5, v.proxy_days_seen_30d)
+    assert.equal(2, v.proxy_provider_count_30d)
+    -- a v1 record has no counts
+    v = resolve({ fx.residential }, "203.0.113.30")
+    assert.is_nil(v.proxy_days_seen_7d)
+  end)
+
+  it("reads the proxy activity counts from the Security Database", function()
+    local v = resolve({ fx.security }, "203.0.113.12")
+    assert.equal(3, v.proxy_days_seen_7d)
+    assert.equal(12, v.proxy_days_seen_30d)
+    assert.equal(4, v.proxy_provider_count_30d)
+  end)
+
   it("resolves company, ASN and abuse contact fields", function()
     local v, t = resolve({ fx.company, fx.asn, fx.abuse }, "203.0.113.9")
     assert.equal("Example Telecom Ltd.", v.company_name)
