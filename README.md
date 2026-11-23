@@ -31,7 +31,7 @@ Most Kong geolocation setups either call a remote API on every request or need a
 - Nothing to compile. The MMDB reader is pure LuaJIT, so it runs on a stock Kong Gateway with no `libmaxminddb`, Redis or extra Lua rocks.
 - Decisions at the edge. Block or route in Kong before the request reaches authentication or your upstream.
 - One plugin, many databases. Location, Security, Company, ASN, Abuse Contact, Hosting and Residential Proxy all load through one list, and the plugin [layers them](#how-it-works).
-- Headers your backend can trust. The plugin removes every client supplied `X-IPGeo-*` header before it adds its own.
+- Headers your backend can trust. The plugin removes every client-supplied `X-IPGeo-*` header before it adds its own.
 - Kong native. Global, Service and Route scopes, DB-less, PostgreSQL and hybrid mode, `KongPlugin` and `KongClusterPlugin`.
 - The same field names, header names and presets as the IPGeolocation.io [Nginx module](https://github.com/IPGeolocation/ngx_http_ipgeolocation_module) and [Traefik plugin](https://github.com/IPGeolocation/traefik-plugin-ipgeolocation), so a backend sees the same headers whichever gateway sits in front of it.
 
@@ -195,7 +195,7 @@ real_ip_header = X-Forwarded-For
 real_ip_recursive = on
 ```
 
-[`examples/kong.yml`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/kong.yml) is a larger example with per country routing, rate limiting per country, a dry run rollout and logging.
+[`examples/kong.yml`](https://github.com/IPGeolocation/kong-plugin-ipgeolocation/blob/main/examples/kong.yml) is a larger example with per-country routing, rate limiting per country, a dry-run rollout and logging.
 
 ## Getting the databases
 
@@ -210,7 +210,7 @@ Download the `.mmdb` files from your [IPGeolocation.io account](https://app.ipge
 | [IP Company](https://ipgeolocation.io/ip-company-database.html) | `db-ip-company.mmdb` | company or ISP name, domain and type |
 | [IP to ASN](https://ipgeolocation.io/ip-asn-database.html) | `db-ip-asn.mmdb` | AS number, name, organization, type and domain; the Extended tier adds RIR, allocation, routes and peers |
 | [IP Abuse Contact](https://ipgeolocation.io/ip-abuse-contact-database.html) | `db-ip-abuse.mmdb` | abuse email, phone, address, route and country |
-| [Residential Proxy](https://ipgeolocation.io/residential-proxy-database.html) | `db-residential-proxy.mmdb` | residential proxy provider and last seen date |
+| [Residential Proxy](https://ipgeolocation.io/residential-proxy-database.html) | `db-residential-proxy.mmdb` | residential proxy provider and last-seen date |
 | [IP Hosting](https://ipgeolocation.io/ip-hosting-database.html) | `db-ip-hosting.mmdb` | hosting provider name |
 
 Combined products ship two files in one archive, for example City + Security as `db-ip-city.mmdb` and `db-ip-security.mmdb`. List both files. Some combined files hold several data sets in one file, such as `db-ip-city-company-asn.mmdb`.
@@ -236,7 +236,7 @@ The plugin can be applied globally, to a Service or to a Route. It cannot be sco
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `headers.preset` | string | `minimal` | Headers to add: `none`, `minimal`, `standard` or `full`. See [Request headers](#request-headers). |
-| `headers.custom` | map | `{}` | Header name to field name, applied on top of the preset. Adds headers with any name (`X-Country: country_code`). An empty field name removes a header the preset added (`X-IPGeo-Latitude: ""`). Client supplied copies of custom headers are removed too. Field names are listed in [docs/FIELDS.md](docs/FIELDS.md). |
+| `headers.custom` | map | `{}` | Header name to field name, applied on top of the preset. Adds headers with any name (`X-Country: country_code`). An empty field name removes a header the preset added (`X-IPGeo-Latitude: ""`). Client-supplied copies of custom headers are removed too. Field names are listed in [docs/FIELDS.md](docs/FIELDS.md). |
 | `headers.boolean_format` | string | `true_false` | Booleans as `true`/`false` (the Traefik plugin's format) or `1`/`0` with `one_zero` (the Nginx module's format). |
 | `headers.list_separator` | string | `,` | Separator for list values such as VPN provider names, 1 to 8 characters. |
 | `headers.language` | string | `en` | Language of country, region, city, continent and currency names: `en`, `de`, `ru`, `ko`, `pt`, `ja`, `fa`, `fr`, `zh`, `es`, `cs` or `it`. Falls back to English where a translation is missing. |
@@ -548,7 +548,7 @@ Yes. Apply the plugin globally so it runs before Kong's router, then match route
 
 <details>
 <summary><strong>Can clients fake the X-IPGeo headers?</strong></summary>
-No. The plugin removes every client supplied header in the `X-IPGeo-` namespace, in any letter case and with underscores, before it adds its own. It also removes client copies of your custom header names. See [Spoofed header protection](#spoofed-header-protection).
+No. The plugin removes every client-supplied header in the `X-IPGeo-` namespace, in any letter case and with underscores, before it adds its own. It also removes client copies of your custom header names. See [Spoofed header protection](#spoofed-header-protection).
 </details>
 
 <details>
@@ -598,7 +598,7 @@ IPGeolocation.io tools:
 
 - [Nginx module](https://github.com/IPGeolocation/ngx_http_ipgeolocation_module), the same databases as native nginx variables ([documentation](https://ipgeolocation.io/documentation/nginx-integration))
 - [Traefik plugin](https://github.com/IPGeolocation/traefik-plugin-ipgeolocation), the same databases as a Traefik middleware
-- [mmdbio](https://github.com/IPGeolocation/mmdbio), a command line tool for reading and inspecting MMDB files
+- [mmdbio](https://github.com/IPGeolocation/mmdbio), a command-line tool for reading and inspecting MMDB files
 - [IPGeolocation.io CLI](https://github.com/IPGeolocation/cli), IP intelligence from your terminal and shell scripts
 - [Integration guides](https://github.com/IPGeolocation/ipgeolocation-guides), setup guides for every integration
 - [All repositories](https://github.com/IPGeolocation)
